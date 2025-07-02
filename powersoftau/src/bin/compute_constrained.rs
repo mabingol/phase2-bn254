@@ -20,7 +20,6 @@ fn main() {
         println!("Usage: \n<challenge_file> <response_file> <circuit_power> <batch_size>");
         std::process::exit(exitcode::USAGE);
     }
-    utils::spawn_memory_reporter();
 
     let challenge_filename = &args[1];
     let response_filename = &args[2];
@@ -68,7 +67,7 @@ fn main() {
         };
 
         let mut digest = &h[..];
-
+        utils::spawn_memory_reporter();
         // Interpret the first 32 bytes of the digest as 8 32-bit words
         let mut seed = [0u32; 8];
         for s in &mut seed {

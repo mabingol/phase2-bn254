@@ -36,8 +36,7 @@ fn main() {
     if print_progress {
         println!("starting");
     }
-    utils::spawn_memory_reporter();
-
+  
     // Create an RNG based on a mixture of system randomness and user provided randomness
     let mut rng = {
         use byteorder::{ReadBytesExt, BigEndian};
@@ -76,7 +75,7 @@ fn main() {
                             .open(in_params_filename)
                             .expect("unable to open.");
     let mut params = MPCParameters::read(reader, disallow_points_at_infinity, true).expect("unable to read params");
-
+    utils::spawn_memory_reporter();
     println!("Contributing to {}...", in_params_filename);
     let mut progress_update_interval: u32 = 0;
     if print_progress {
