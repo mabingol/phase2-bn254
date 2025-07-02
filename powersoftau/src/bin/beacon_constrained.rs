@@ -1,29 +1,32 @@
 extern crate hex;
-use powersoftau::{
-    batched_accumulator::BatchedAccumulator,
-    keypair::keypair,
-    parameters::{CeremonyParams, CheckForCorrectness, UseCompression},
-    utils::calculate_hash,
-};
+extern crate hex_literal;
+use powersoftau::{batched_accumulator::BatchedAccumulator, keypair::keypair, parameters::{CeremonyParams, CheckForCorrectness, UseCompression}, utils, utils::calculate_hash};
 
-use bellman_ce::pairing::bn256::Bn256;
 use memmap::MmapOptions;
 use std::fs::OpenOptions;
 
+use bellman_ce::pairing::bls12_381::Bls12;
 use std::io::Write;
-extern crate hex_literal;
-
+use std::thread;
+use std::time::Duration;
+use std::time::Instant;
+ 
 const INPUT_IS_COMPRESSED: UseCompression = UseCompression::No;
 const COMPRESS_THE_OUTPUT: UseCompression = UseCompression::Yes;
 const CHECK_INPUT_CORRECTNESS: CheckForCorrectness = CheckForCorrectness::No;
 
+
+
 #[allow(clippy::modulo_one)]
 fn main() {
+    let start = Instant::now();
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 7 {
         println!("Usage: \n<challenge_file> <response_file> <circuit_power> <batch_size> <beacon_hash> <num_iterations_exp>");
         std::process::exit(exitcode::USAGE);
     }
+    utils::spawn_memory_reporter();
+
     let challenge_filename = &args[1];
     let response_filename = &args[2];
     let circuit_power = args[3].parse().expect("could not parse circuit power");
@@ -36,7 +39,7 @@ fn main() {
         std::process::exit(exitcode::DATAERR);
     }
 
-    let parameters = CeremonyParams::<Bn256>::new(circuit_power, batch_size);
+    let parameters = CeremonyParams::<Bls12>::new(circuit_power, batch_size);
 
     println!(
         "Will contribute a random beacon to accumulator for 2^{} powers of tau",
@@ -225,4 +228,5 @@ fn main() {
     }
 
     println!("Thank you for your participation, much appreciated! :)");
+    println!("time elapsed in seconds {}.", start.elapsed().as_secs_f64())
 }

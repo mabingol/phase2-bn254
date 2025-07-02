@@ -13,6 +13,7 @@ extern crate num_traits;
 extern crate cfg_if;
 extern crate itertools;
 extern crate blake2;
+extern crate sysinfo;
 
 use cfg_if::cfg_if;
 

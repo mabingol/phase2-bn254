@@ -15,13 +15,17 @@ use std::fs::File;
 use std::fs::OpenOptions;
 
 use phase2::parameters::MPCParameters;
+use phase2::utils;
 
 fn main() {
+
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 5 {
         println!("Usage: \n<in_params.params> <in_beacon_hash> <in_num_iterations_exp> <out_params.params>");
         std::process::exit(exitcode::USAGE);
     }
+    utils::spawn_memory_reporter();
+
     let in_params_filename = &args[1];
     let beacon_hash = &args[2];
     let num_iterations_exp = &args[3].parse::<usize>().unwrap();

@@ -5,6 +5,7 @@ RUN apt-get update && \
 WORKDIR /build
 COPY . .
 RUN mkdir bin
+
 RUN cd powersoftau && \
     cargo build --release --bins && \
     find ./target/release/ -maxdepth 1 -type f -perm /a+x -exec sh -c 'mv {} /build/bin/phase1_$(basename {})' \;
@@ -12,5 +13,5 @@ RUN cd phase2 && \
     cargo build --release --bins && \
     find ./target/release/ -maxdepth 1 -type f -perm /a+x -exec sh -c 'mv {} /build/bin/phase2_$(basename {})' \;
 
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 COPY --from=builder /build/bin/* /usr/bin/

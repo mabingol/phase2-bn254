@@ -6,6 +6,7 @@ use phase2::circom_circuit::{
     verification_key_json_file,
     load_params_file
 };
+use phase2::utils;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -13,6 +14,8 @@ fn main() {
         println!("Usage: \n<in_params.params> <out_vk.json> <out_pk.json>");
         std::process::exit(exitcode::USAGE);
     }
+    utils::spawn_memory_reporter();
+
     let params_filename = &args[1];
     let vk_filename = &args[2];
     let pk_filename = &args[3];

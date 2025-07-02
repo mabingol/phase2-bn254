@@ -2,16 +2,21 @@ use powersoftau::batched_accumulator::BatchedAccumulator;
 use powersoftau::parameters::UseCompression;
 use powersoftau::utils::{blank_hash, calculate_hash};
 
-use bellman_ce::pairing::bn256::Bn256;
+
+use bellman_ce::pairing::bls12_381::Bls12;
 use memmap::*;
 use std::fs::OpenOptions;
 use std::io::Write;
-
+use std::time::Instant;
 use powersoftau::parameters::CeremonyParams;
+use powersoftau::utils;
 
 const COMPRESS_NEW_CHALLENGE: UseCompression = UseCompression::No;
 
 fn main() {
+    let start = Instant::now();
+    utils::spawn_memory_reporter();
+
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 4 {
         println!("Usage: \n<challenge_file> <ceremony_size> <batch_size>");
@@ -21,7 +26,7 @@ fn main() {
     let circuit_power = args[2].parse().expect("could not parse circuit power");
     let batch_size = args[3].parse().expect("could not parse batch size");
 
-    let parameters = CeremonyParams::<Bn256>::new(circuit_power, batch_size);
+    let parameters = CeremonyParams::<Bls12>::new(circuit_power, batch_size);
 
     println!(
         "Will generate an empty accumulator for 2^{} powers of tau",
@@ -100,4 +105,6 @@ fn main() {
     }
 
     println!("Wrote a fresh accumulator to challenge file");
+    println!("time elapsed in seconds {}.", start.elapsed().as_secs_f64())
+
 }

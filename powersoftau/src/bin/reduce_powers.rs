@@ -1,13 +1,9 @@
-use bellman_ce::pairing::bn256::Bn256;
-use powersoftau::{
-    batched_accumulator::BatchedAccumulator,
-    parameters::{CeremonyParams, CheckForCorrectness, UseCompression},
-    utils::{calculate_hash, reduced_hash},
-};
+use powersoftau::{batched_accumulator::BatchedAccumulator, parameters::{CeremonyParams, CheckForCorrectness, UseCompression}, utils, utils::{calculate_hash, reduced_hash}};
+use bellman_ce::pairing::bls12_381::Bls12;
 
 use std::fs::OpenOptions;
 use std::io::Write;
-
+use std::time::Instant;
 use memmap::MmapOptions;
 
 const fn num_bits<T>() -> usize {
@@ -20,18 +16,23 @@ pub fn log_2(x: u64) -> u32 {
 }
 
 fn main() {
+
+    let start = Instant::now();
+
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 6 {
         println!("Usage: \n<challenge_filename> <reduced_challenge_filename> <original_circuit_power> <reduced_circuit_power> <batch_size>");
         std::process::exit(exitcode::USAGE);
     }
+    utils::spawn_memory_reporter();
+
     let challenge_filename = &args[1];
     let reduced_challenge_filename = &args[2];
     let original_circuit_power = args[3].parse().expect("could not parse original circuit power");
     let reduced_circuit_power = args[4].parse().expect("could not parse reduced circuit power");
     let batch_size = args[5].parse().expect("could not parse batch size");
 
-    let parameters = CeremonyParams::<Bn256>::new(reduced_circuit_power, batch_size);
+    let parameters = CeremonyParams::<Bls12>::new(reduced_circuit_power, batch_size);
 
     // Try to load the challenge from disk.
     let reader = OpenOptions::new()
@@ -128,4 +129,6 @@ fn main() {
     }
 
     println!("Wrote a reduced accumulator to `./challenge`");
+    println!("time elapsed in seconds {}.", start.elapsed().as_secs_f64())
+
 }

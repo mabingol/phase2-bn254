@@ -13,8 +13,10 @@ use std::fs::File;
 use std::fs::OpenOptions;
 
 use phase2::parameters::MPCParameters;
+use phase2::utils;
 
 fn main() {
+
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 4 && args.len() != 6 {
         println!("Usage: \n<in_params.params> <out_params.params> <in_str_entropy>");
@@ -34,6 +36,8 @@ fn main() {
     if print_progress {
         println!("starting");
     }
+    utils::spawn_memory_reporter();
+
     // Create an RNG based on a mixture of system randomness and user provided randomness
     let mut rng = {
         use byteorder::{ReadBytesExt, BigEndian};

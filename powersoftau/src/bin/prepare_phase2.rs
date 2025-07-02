@@ -1,5 +1,5 @@
-use bellman_ce::pairing::bn256::Bn256;
-use bellman_ce::pairing::bn256::{G1, G2};
+use bellman_ce::pairing::bls12_381::Bls12;
+use bellman_ce::pairing::bls12_381::{G1, G2};
 use bellman_ce::pairing::{CurveAffine, CurveProjective};
 use powersoftau::batched_accumulator::*;
 use powersoftau::parameters::CeremonyParams;
@@ -12,7 +12,7 @@ use bellman_ce::multicore::Worker;
 
 use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
-
+use std::time::Instant;
 use memmap::*;
 
 const fn num_bits<T>() -> usize {
@@ -25,16 +25,21 @@ fn log_2(x: u64) -> u32 {
 }
 
 fn main() {
+
+    let start = Instant::now();
+
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 4 {
         println!("Usage: \n<response_filename> <circuit_power> <batch_size>");
         std::process::exit(exitcode::USAGE);
     }
+    utils::spawn_memory_reporter();
+
     let response_filename = &args[1];
     let circuit_power = args[2].parse().expect("could not parse circuit power");
     let batch_size = args[3].parse().expect("could not parse batch size");
 
-    let parameters = CeremonyParams::<Bn256>::new(circuit_power, batch_size);
+    let parameters = CeremonyParams::<Bls12>::new(circuit_power, batch_size);
 
     // Try to load response file from disk.
     let reader = OpenOptions::new()
@@ -239,4 +244,6 @@ fn main() {
                 .unwrap();
         }
     }
+    println!("time elapsed in seconds {}.", start.elapsed().as_secs_f64())
+
 }

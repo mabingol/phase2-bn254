@@ -5,6 +5,7 @@ use phase2::circom_circuit::{
     load_params_file,
     create_verifier_sol_file
 };
+use phase2::utils;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -12,6 +13,8 @@ fn main() {
         println!("Usage: \n<params> <out_contract.sol>");
         std::process::exit(exitcode::USAGE);
     }
+    utils::spawn_memory_reporter();
+
     let params_filename = &args[1];
     let verifier_filename = &args[2];
     let params = load_params_file(params_filename);

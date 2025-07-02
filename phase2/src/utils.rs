@@ -9,6 +9,8 @@ use byteorder::{
 use num_bigint::BigUint;
 use num_traits::Num;
 use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
 use bellman_ce::pairing::{
     ff::{
         PrimeField,
@@ -29,8 +31,25 @@ use rand::{
     ChaChaRng,
     SeedableRng
 };
+use sysinfo::System;
 
+pub fn spawn_memory_reporter() {
+    thread::spawn(|| {
+        let pid = sysinfo::Pid::from(std::process::id() as usize);
+        let mut sys = System::new_all();
 
+        loop {
+            sys.refresh_process(pid);
+            if let Some(proc) = sys.process(pid) {
+                let memory_kb = proc.memory(); // memory in bytes
+                println!("Memory usage: {} GB", memory_kb as f64/1024f64/1024f64/1024f64);
+            } else {
+                eprintln!("Failed to get process info.");
+            }
+            thread::sleep(Duration::from_secs(3));
+        }
+    });
+}
 /// Checks if pairs have the same ratio.
 pub fn same_ratio<G1: CurveAffine>(
     g1: (G1, G1),
@@ -181,5 +200,7 @@ pub fn pairing_to_vec(p: &Fq12) -> Vec<Vec<Vec<String>>> {
                 repr_to_big(p.c1.c2.c1.into_repr()),
             ]
         ],
-    ]
+    ];
 }
+    
+    

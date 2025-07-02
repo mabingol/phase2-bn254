@@ -17,6 +17,7 @@ use phase2::circom_circuit::{
     circuit_from_json_file,
     witness_from_json_file
 };
+use phase2::utils;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -24,6 +25,8 @@ fn main() {
         println!("Usage: \n<circuit.json> <witness.json> <params> <proof.json> <public.json>");
         std::process::exit(exitcode::USAGE);
     }
+    utils::spawn_memory_reporter();
+
     let circuit_filename = &args[1];
     let witness_filename = &args[2];
     let params_filename = &args[3];

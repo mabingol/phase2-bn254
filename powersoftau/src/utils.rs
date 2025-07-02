@@ -9,10 +9,29 @@ use rand::{Rand, Rng, SeedableRng};
 use memmap::Mmap;
 use std::io::{self, Write};
 use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
+use sysinfo::System;
 use typenum::consts::U64;
 
 use super::parameters::UseCompression;
+pub fn spawn_memory_reporter() {
+    thread::spawn(|| {
+        let pid = sysinfo::Pid::from(std::process::id() as usize);
+        let mut sys = System::new_all();
 
+        loop {
+            sys.refresh_process(pid);
+            if let Some(proc) = sys.process(pid) {
+                let memory_kb = proc.memory(); // memory in bytes
+                println!("Memory usage: {} GB", memory_kb as f64/1024f64/1024f64/1024f64);
+            } else {
+                eprintln!("Failed to get process info.");
+            }
+            thread::sleep(Duration::from_secs(3));
+        }
+    });
+}
 /// Calculate the contribution hash from the resulting file. Original powers of tau implementation
 /// used a specially formed writer to write to the file and calculate a hash on the fly, but memory-constrained
 /// implementation now writes without a particular order, so plain recalculation at the end

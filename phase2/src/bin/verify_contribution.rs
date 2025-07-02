@@ -5,6 +5,7 @@ use std::fs::OpenOptions;
 
 use phase2::parameters::*;
 use phase2::circom_circuit::circuit_from_json_file;
+use phase2::utils;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -12,6 +13,8 @@ fn main() {
         println!("Usage: \n<in_circuit.json> <in_old_params.params> <in_new_params.params> <path/to/phase1radix>");
         std::process::exit(exitcode::USAGE);
     }
+    utils::spawn_memory_reporter();
+
     let circuit_filename = &args[1];
     let old_params_filename = &args[2];
     let new_params_filename = &args[3];

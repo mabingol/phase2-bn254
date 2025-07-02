@@ -5,6 +5,7 @@ extern crate exitcode;
 use std::fs::File;
 use phase2::parameters::MPCParameters;
 use phase2::circom_circuit::circuit_from_json_file;
+use phase2::utils;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -12,6 +13,8 @@ fn main() {
         println!("Usage: \n<in_circuit.json> <out_params.params> <path/to/phase1radix>");
         std::process::exit(exitcode::USAGE);
     }
+    utils::spawn_memory_reporter();
+
     let circuit_filename = &args[1];
     let params_filename = &args[2];
     let radix_directory = &args[3];
